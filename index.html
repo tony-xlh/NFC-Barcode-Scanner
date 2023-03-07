@@ -15,10 +15,20 @@
     <div>
       <button id="BarcodeBtn" onclick="scanBarcodes();">Scan Barcodes</button>
     </div>
+    <div>
+      NFC Results:
+      <ol id="NFCResults"></ol>
+    </div>
+    <div>
+      Barcode Results:
+      <ol id="BarcodeResults"></ol>
+    </div>
   </div>
   <script type="text/javascript">
     let ndef;
     let abortController;
+    let NFCResults = [];
+    let barcodeResults = [];
     checkIFNFCSupported();
     function checkIFNFCSupported(){
       if (!("NDEFReader" in window)) {
@@ -52,6 +62,9 @@
         ndef.onreading = event => {
           console.log("NDEF message read.");
           console.log(event);
+          NFCResults = [];
+          NFCResults = NFCResults.concat(event.message.records);
+          displayNFCResults();
         };
       }
       ndef.scan({ signal: abortController.signal }).then(() => {
@@ -59,6 +72,24 @@
       }).catch(error => {
         console.log(`Error! Scan failed to start: ${error}.`);
       });
+    }
+
+    function displayNFCResults(){
+      const ol = document.getElementById("NFCResults");
+      ol.innerHTML = "";
+      for (let index = 0; index < NFCResults.length; index++) {
+        const record = NFCResults[index];
+        const buf = record.data.buffer;
+        const str = new TextDecoder().decode(buf);
+        console.log(str);
+        const li = document.createElement("li");
+        li.innerText = str;
+        ol.appendChild(li);
+      }
+    }
+
+    function displayBarcodeResults(){
+      
     }
   </script>
 </body>
