@@ -20,6 +20,7 @@
       .sel-container {display:block;margin-top:5px;}
       .close-btn{position: absolute;right: 0;top: 0;}
       li {word-break: break-all;}
+      span {word-break: break-all;}
     </style>
 </head>
 <body>
@@ -195,7 +196,19 @@
       for (let index = 0; index < barcodeResults.length; index++) {
         const result = barcodeResults[index];
         const li = document.createElement("li");
-        li.innerText = result.barcodeText;
+        const container = document.createElement("div");
+        const span = document.createElement("span");
+        span.innerText = result.barcodeText;
+        container.appendChild(span);
+        if ("NDEFReader" in window) {
+          const btn = document.createElement("button");
+          btn.innerText = "Write to NFC Tag"
+          btn.addEventListener('click',function(){
+            writeNFCTag(result.barcodeText);
+          });
+          container.appendChild(btn);
+        }
+        li.appendChild(container);
         ol.appendChild(li);
       }
     }
@@ -216,6 +229,18 @@
       }else{
         alert("Please scan the NFC tag and barcode first.");
       }
+    }
+
+    function writeNFCTag(message){
+      alert("Put the device close to the tag to write");
+      const ndef = new NDEFReader();
+      ndef.write(
+        message
+      ).then(() => {
+        alert("Message written.");
+      }).catch(error => {
+        alert(`Write failed :-( try again: ${error}.`);
+      });
     }
   </script>
 </body>
