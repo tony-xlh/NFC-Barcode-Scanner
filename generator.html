@@ -13,7 +13,7 @@
   <input type="text" id="key" value="dynamsoft"></input>
   <div id="placeHolder"></div>
   <button onclick="createQRCode();">Create Encrypted QR Code</button>
-  <button id="NFC-btn" onclick="write();">Write Key to NFC Tag</button>
+  <button id="NFC-btn" onclick="writeNFCTag();">Write Key to NFC Tag</button>
 <script>
   checkIFNFCSupported();
   function checkIFNFCSupported(){
@@ -39,7 +39,8 @@
     img.setAttribute("height",height); 
   }
 
-  function write(){
+  function writeNFCTag(){
+    alert("Put the device close to the tag to write");
     let key = document.getElementById("key").value;
     const ndef = new NDEFReader();
     ndef.write(
