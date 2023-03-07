@@ -13,8 +13,15 @@
   <input type="text" id="key" value="dynamsoft"></input>
   <div id="placeHolder"></div>
   <button onclick="createQRCode();">Create Encrypted QR Code</button>
-  <button onclick="write();">Write Key to NFC Tag</button>
+  <button id="NFC-btn" onclick="write();">Write Key to NFC Tag</button>
 <script>
+  checkIFNFCSupported();
+  function checkIFNFCSupported(){
+    if (!("NDEFReader" in window)) {
+      alert("NFC is not supported.");
+      document.getElementById("NFC-btn").disabled = true;
+    }
+  }
   function createQRCode(){
     let typeNumber = 0;
     let errorCorrectionLevel = 'L';
@@ -33,7 +40,15 @@
   }
 
   function write(){
-    
+    let key = document.getElementById("key").value;
+    const ndef = new NDEFReader();
+    ndef.write(
+      key
+    ).then(() => {
+      alert("Message written.");
+    }).catch(error => {
+      alert(`Write failed :-( try again: ${error}.`);
+    });
   }
 </script>
 </body>
