@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NFC and Barcode Scanner</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <style>
+    </style>
+</head>
+<body>
+  <div class="app">
+    <div>NFC and Barcode Scanner</div>
+    <div>
+      <button id="NFCBtn" onclick="toggleNFCScanning();">Scan NFC Tags</button>
+    </div>
+    <div>
+      <button id="BarcodeBtn" onclick="scanBarcodes();">Scan Barcodes</button>
+    </div>
+  </div>
+  <script type="text/javascript">
+    let ndef;
+    let abortController;
+    checkIFNFCSupported();
+    function checkIFNFCSupported(){
+      if (!("NDEFReader" in window)) {
+        alert("NFC is not supported.");
+        document.getElementById("NFCBtn").disabled = true;
+      }
+    }
+ 
+    function toggleNFCScanning(){
+      const btn = document.getElementById("NFCBtn");
+      if (btn.innerText === "Scan NFC Tags") {
+        btn.innerText = "Stop Scanning NFC Tags";
+        scanNFCTags();
+      }else{
+        btn.innerText = "Scan NFC Tags";
+        abortController.abort();
+      }
+    }
+
+    async function scanNFCTags(){
+      if (!ndef) {
+        abortController = new AbortController();
+        abortController.signal.onabort = event => {
+          // All NFC operations have been aborted.
+          console.log(event);
+        };
+        ndef = new NDEFReader();
+        ndef.onreadingerror = () => {
+          console.log("Cannot read data from the NFC tag. Try another one?");
+        };
+        ndef.onreading = event => {
+          console.log("NDEF message read.");
+          console.log(event);
+        };
+      }
+      ndef.scan({ signal: abortController.signal }).then(() => {
+        console.log("Scan started successfully.");
+      }).catch(error => {
+        console.log(`Error! Scan failed to start: ${error}.`);
+      });
+    }
+  </script>
+</body>
+</html>
